@@ -1,8 +1,10 @@
 import { Router } from "express";
-import { getUser } from "../controllers/login";
+import { getUserByEmail } from "../controllers/login";
+import validate from "../middlewares/validate";
+import { loginSchema } from "../schemas/user";
 
 const router = Router();
 
-router.post("/", getUser);
+router.post("/", validate(loginSchema), getUserByEmail);
 
 export default router;

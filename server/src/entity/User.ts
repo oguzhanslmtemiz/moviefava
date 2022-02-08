@@ -4,7 +4,9 @@ import {
   Column,
   BaseEntity,
   CreateDateColumn,
+  BeforeInsert,
 } from "typeorm";
+import { hashPassword } from "../utils/helper";
 
 @Entity()
 export class User extends BaseEntity {
@@ -22,4 +24,9 @@ export class User extends BaseEntity {
 
   @CreateDateColumn()
   createdAt!: Date;
+
+  @BeforeInsert()
+  async hashPass() {
+    this.password = await hashPassword(this.password);
+  }
 }
