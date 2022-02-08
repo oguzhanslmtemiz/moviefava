@@ -1,8 +1,11 @@
 require("dotenv").config();
 import express, { Application } from "express";
+import loaders from "./loaders";
 
 async function startServer(): Promise<void> {
   const app: Application = express();
+
+  await loaders(app);
 
   const PORT: number = Number(process.env.PORT) || 3000;
   app.listen(PORT, () => {
