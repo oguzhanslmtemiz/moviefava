@@ -22,6 +22,9 @@ export class User extends BaseEntity {
   @Column()
   password!: string;
 
+  @Column({ default: false })
+  isPassAutoGen!: boolean;
+
   @CreateDateColumn()
   createdAt!: Date;
 

@@ -1,8 +1,13 @@
 import { User } from "../entity/User";
 import { IUser } from "../interfaces/User";
 
-const createUserInDB = async (userDataFromReqBody: IUser) => {
-  return await User.create(userDataFromReqBody).save();
+const createUserInDB = async (
+  userDataFromReqBody: IUser,
+  isSocialRegister: boolean = false
+) => {
+  return isSocialRegister
+    ? await User.create({ ...userDataFromReqBody, isPassAutoGen: true }).save()
+    : await User.create(userDataFromReqBody).save();
 };
 
 const findUserFromDB = async (userEmailFromReqBody: string) => {
