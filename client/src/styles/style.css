@@ -1,0 +1,10 @@
+.kep-login-facebook {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  background-color: #385499 !important;
+  text-transform: unset !important;
+  border: none !important;
+  border-radius: 2px !important;
+  font-weight: unset !important;
+}

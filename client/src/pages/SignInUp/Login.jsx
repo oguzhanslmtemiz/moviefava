@@ -1,73 +1,72 @@
-// // import axios from "axios";
-// import { useEffect, useState } from "react";
-// import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { FormControl, TextField, Button, Box } from "@mui/material";
+import { useSnackbar } from "notistack";
 import styles from "./SignInUp.module.css";
-import { FormControl, TextField, Button } from "@mui/material";
+import GoogleSign from "../../components/GoogleSign";
+import FacebookSign from "../../components/FacebookSign";
+import { signIn } from "../../api";
 
 export default function Login() {
-  //   const [message, setMessage] = useState("");
-  //   let navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
 
-  //   useEffect(() => {
-  //     const timer = setTimeout(() => setMessage(""), 3000);
-  //     return () => clearTimeout(timer);
-  //   }, [message]);
+  const [emailError, setEmailError] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
+  const [emailErrorMessage, setEmailErrorMessage] = useState("");
+  const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
 
-  //   const handleLogin = async (body) => {
-  //     const axiosConfig = {
-  //       headers: { "Content-Type": "application/json" },
-  //       // withCredentials: true,
-  //     };
-  //     axios.defaults.withCredentials = true;
-  //     try {
-  //       const { data } = await axios.post(
-  //         "http://localhost:3000/login" ,
-  //         body,
-  //         axiosConfig
-  //       );
-  //       setMessage(data.message);
-  //       console.log(data);
-  //       navigate("/dashboard");
-  //     } catch (error) {
-  //       if (error.response) {
-  //         // The request was made and the server responded with a status code
-  //         // that falls out of the range of 2xx
-  //         setMessage(error.response.data.error);
-  //         // console.log(error.response.data);
-  //         // console.log(error.response.status);
-  //         // console.log(error.response.headers);
-  //       } else if (error.request) {
-  //         // The request was made but no response was received
-  //         // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-  //         // http.ClientRequest in node.js
-  //         setMessage("Bad things happened :(");
-  //         console.log(error.request);
-  //       } else {
-  //         // Something happened in setting up the request that triggered an Error
-  //         setMessage("Something happened :)");
-  //         console.log("Error", error.message);
-  //       }
-  //     }
-  //   };
+  let navigate = useNavigate();
 
-  //   const handleSubmit = (e) => {
-  //     e.preventDefault();
-
-  //     const formData = new FormData(e.target);
-  //     const body = Object.fromEntries(formData.entries());
-
-  //     handleLogin(body);
-  //   };
+  const handleLogin = async (body) => {
+    try {
+      const { data } = await signIn(body);
+      enqueueSnackbar(JSON.stringify(data.message), { variant: "success" });
+      navigate("/profile");
+      localStorage.setItem("jwt", JSON.stringify(data.data));
+    } catch (error) {
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        const { data, payload } = error.response.data;
+        enqueueSnackbar(JSON.stringify(payload?.message), {
+          variant: "error",
+        });
+        // console.log("error.response", error.response.data);
+        data?.forEach((err) => {
+          if (err.context.key === "email") {
+            setEmailError(true);
+            setEmailErrorMessage(err.message);
+          }
+          if (err.context.key === "password") {
+            setPasswordError(true);
+            setPasswordErrorMessage(err.message);
+          }
+        });
+      } else if (error.request) {
+        // The request was made but no response was received
+        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+        // http.ClientRequest in node.js
+        enqueueSnackbar("Bad things happened :(", {
+          variant: "error",
+        });
+        console.log("error.request", error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        enqueueSnackbar("Something happened :)", { variant: "error" });
+        console.log("Error", error.message);
+      }
+    }
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
+    const formData = new FormData(event.currentTarget);
+    const body = Object.fromEntries(formData.entries());
+    handleLogin(body);
   };
+
   const inputStyle = { maxWidth: 380, width: "100%" };
+
   return (
     <FormControl
       className={styles["sign-in-form"]}
@@ -78,12 +77,16 @@ export default function Login() {
       <TextField
         sx={inputStyle}
         margin="normal"
-        // id="email"
         label="Email Address"
         name="email"
         type="email"
-        autoFocus
         required
+        error={emailError}
+        helperText={emailErrorMessage}
+        onChange={() => {
+          setEmailError(false);
+          setEmailErrorMessage("");
+        }}
       />
       <TextField
         sx={inputStyle}
@@ -92,7 +95,12 @@ export default function Login() {
         name="password"
         label="Password"
         type="password"
-        // id="password"
+        error={passwordError}
+        helperText={passwordErrorMessage}
+        onChange={() => {
+          setPasswordError(false);
+          setPasswordErrorMessage("");
+        }}
       />
       <Button
         type="submit"
@@ -102,11 +110,17 @@ export default function Login() {
           height: 49,
           bgcolor: "#f45d48",
           ":hover": { bgcolor: "#ef523c" },
-          mt: 3,
+          my: 2,
         }}
       >
         Sign In
       </Button>
+      <Box sx={{ mt: 1 }}>
+        <GoogleSign />
+      </Box>
+      <Box sx={{ mt: 1 }}>
+        <FacebookSign />
+      </Box>
     </FormControl>
   );
 }
