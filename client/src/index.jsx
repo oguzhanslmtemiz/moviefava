@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import CssBaseline from "@mui/material/CssBaseline";
 import { SnackbarProvider } from "notistack";
 import App from "./App";
-import ToggleColorMode from "./styles/ToggleColorMode";
+import ToggleColorMode from "./contexts/ToggleColorMode";
 
 ReactDOM.render(
   <React.StrictMode>

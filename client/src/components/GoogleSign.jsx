@@ -1,16 +1,30 @@
 import React from "react";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from "react-google-login";
+import { useSnackbar } from "notistack";
 import { sendGoogleCredentialsThenFetchToken } from "../api";
+import useAuth from "../contexts/AuthContext";
 
 export default function GoogleSign() {
-  // let navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
+  const { login, setUser } = useAuth();
+
+  const navigate = useNavigate();
 
   const onSuccess = async (response) => {
     try {
       const { data } = await sendGoogleCredentialsThenFetchToken(response.profileObj);
-      localStorage.setItem("jwt", JSON.stringify(data));
-      // redirect
+
+      await login().then(() => {
+        localStorage.setItem("jwt", data.data.token);
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ ...data.data.user, avatar: response.profileObj.imageUrl })
+        );
+        setUser({ ...data.data.user, avatar: response.profileObj.imageUrl });
+        enqueueSnackbar(JSON.stringify(data.message), { variant: "success" });
+        navigate("/profile");
+      });
     } catch (error) {
       console.log("ERROR:", error);
     }

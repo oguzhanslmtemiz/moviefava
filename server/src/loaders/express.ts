@@ -2,6 +2,7 @@ import express, { Application } from "express";
 import morgan from "morgan";
 import cors from "cors";
 import routes from "../routes";
+import path from "path";
 
 export default (app: Application) => {
   app.use(express.json());
@@ -16,10 +17,16 @@ export default (app: Application) => {
     })
   );
 
+  // app.use(express.static(path.join(__dirname, "../../../client/build")));
+
+  // app.get("/*", (req, res) => {
+  //   res.sendFile(path.join(__dirname, "../../../client/build", "index.html"));
+  // });
+
+  // Routes
+  app.use("/api", routes);
+
   if (process.env.NODE_ENV === "development") {
     app.use(morgan("dev"));
   }
-
-  // Routes
-  app.use(routes);
 };

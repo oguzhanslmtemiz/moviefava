@@ -1,6 +1,6 @@
 import React, { createContext } from "react";
 import { createTheme, ThemeProvider } from "@mui/material";
-import { darkTheme, lightTheme } from "./theme";
+import { darkTheme, lightTheme } from "../styles/theme";
 
 export const ColorModeContext = createContext({
   toggleColorMode: () => {},

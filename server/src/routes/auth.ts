@@ -1,8 +1,15 @@
 import { Router } from "express";
-import { googleAuth } from "../controllers/auth";
+import { socialLoginAuth, successfulAuth } from "../controllers/auth";
+import { userAuth } from "../middlewares/auth";
 
 const router = Router();
 
-router.post("/google", googleAuth);
+// @desc
+// @route   api/auth
+// @access  Public
+
+router.get("/", userAuth, successfulAuth);
+router.post("/google", socialLoginAuth);
+router.post("/facebook", socialLoginAuth);
 
 export default router;

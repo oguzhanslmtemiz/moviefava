@@ -1,18 +1,32 @@
 import React from "react";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import FacebookLogin from "react-facebook-login";
 import FacebookIcon from "@mui/icons-material/Facebook";
+import { useSnackbar } from "notistack";
 import { sendFacebookCredentialsThenFetchToken } from "../api";
+import useAuth from "../contexts/AuthContext";
 import "../styles/style.css";
 
 export default function FacebookSign() {
-  // let navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
+  const { login, setUser } = useAuth();
+
+  const navigate = useNavigate();
 
   const responseFacebook = async (response) => {
     try {
       const { data } = await sendFacebookCredentialsThenFetchToken(response);
-      localStorage.setItem("jwt", JSON.stringify(data));
-      // redirect
+      login().then(() => {
+        localStorage.setItem("jwt", data.data.token);
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ ...data.data.user, avatar: response.picture.data.url })
+        );
+        console.log(response);
+        setUser({ ...data.data.user, avatar: response.picture.url });
+        enqueueSnackbar(JSON.stringify(data.message), { variant: "success" });
+        navigate("/profile");
+      });
     } catch (error) {
       console.log("ERROR:", error);
     }

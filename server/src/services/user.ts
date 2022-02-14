@@ -14,4 +14,15 @@ const findUserFromDB = async (userEmailFromReqBody: string) => {
   return await User.findOne({ email: userEmailFromReqBody });
 };
 
-export { createUserInDB, findUserFromDB };
+const getUserPosts = async (userId: number) => {
+  return await User.findOne({
+    relations: ["movies", "actors"],
+    where: { id: userId },
+    select: ["email", "id", "username"],
+  });
+  // return await User.find({ relations: ["movies", "actors"], where: { id: userId } });
+  //   // return await Movie.find({ relations: ["user"] });
+  // return await Movie.find({ where: { user: { id: userId } } });
+};
+
+export { createUserInDB, findUserFromDB, getUserPosts };

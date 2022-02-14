@@ -8,25 +8,31 @@ import {
   createAlphaNumericUniqueString,
   errorHandler,
   generateToken,
+  sanitizeUser,
 } from "../utils/helper";
 
-export const googleAuth = async (req: Request, res: Response) => {
+export const socialLoginAuth = async (req: Request, res: Response) => {
   try {
-    const googleCredentialsFromClient = req.body;
+    const socialLoginCredentialsFromClient = req.body;
 
-    const user = await findUserFromDB(googleCredentialsFromClient.email);
+    let user = await findUserFromDB(socialLoginCredentialsFromClient.email);
 
     if (!user) {
       const userCredentials: IUser = {
-        email: googleCredentialsFromClient.email,
+        email: socialLoginCredentialsFromClient.email,
         password: createAlphaNumericUniqueString(),
-        username: convertAlphaNumericUniqueString(googleCredentialsFromClient.name),
+        username: convertAlphaNumericUniqueString(socialLoginCredentialsFromClient.name),
       };
-      await createUserInDB(userCredentials, true);
+      user = await createUserInDB(userCredentials, true);
     }
-    const token = generateToken(googleCredentialsFromClient);
+    const userWithOutPassword = sanitizeUser(user);
+    const token = generateToken(userWithOutPassword);
 
-    res.json(token);
+    res.status(200).send({
+      success: true,
+      message: "You have successfully logged in",
+      data: { user: userWithOutPassword, token },
+    });
   } catch (error) {
     const dbError = error as IDatabaseError;
     dbError.code === "ER_DUP_ENTRY"
@@ -34,3 +40,5 @@ export const googleAuth = async (req: Request, res: Response) => {
       : errorHandler(res, Boom.internal("", error));
   }
 };
+
+export const successfulAuth = (req: Request, res: Response) => res.sendStatus(200);

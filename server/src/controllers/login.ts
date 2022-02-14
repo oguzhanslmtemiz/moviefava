@@ -20,10 +20,11 @@ export const getUserByEmail = async (req: Request, res: Response) => {
       if (isMatchPassword) {
         const userWithOutPassword = sanitizeUser(user);
         const token = generateToken(userWithOutPassword);
+        res.locals.test = "TEST";
         res.status(200).send({
           success: true,
           message: "You have successfully logged in",
-          data: token,
+          data: { user: userWithOutPassword, token },
         });
       } else {
         errorHandler(res, Boom.unauthorized("Your password is not correct"));

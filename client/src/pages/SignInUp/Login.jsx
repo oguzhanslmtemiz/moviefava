@@ -6,23 +6,29 @@ import styles from "./SignInUp.module.css";
 import GoogleSign from "../../components/GoogleSign";
 import FacebookSign from "../../components/FacebookSign";
 import { signIn } from "../../api";
+import useAuth from "../../contexts/AuthContext";
 
 export default function Login() {
   const { enqueueSnackbar } = useSnackbar();
+  const { login, setUser } = useAuth();
 
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = useState("");
   const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
 
-  let navigate = useNavigate();
+  const navigate = useNavigate();
 
   const handleLogin = async (body) => {
     try {
       const { data } = await signIn(body);
-      enqueueSnackbar(JSON.stringify(data.message), { variant: "success" });
-      navigate("/profile");
-      localStorage.setItem("jwt", JSON.stringify(data.data));
+      login().then(() => {
+        localStorage.setItem("jwt", data.data.token);
+        localStorage.setItem("user", JSON.stringify(data.data.user));
+        setUser(data.data.user);
+        enqueueSnackbar(JSON.stringify(data.message), { variant: "success" });
+        navigate("/profile");
+      });
     } catch (error) {
       if (error.response) {
         // The request was made and the server responded with a status code

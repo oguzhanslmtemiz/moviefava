@@ -7,7 +7,8 @@ module.exports = {
   database: process.env.DB_NAME,
   synchronize: process.env.NODE_ENV !== "production",
   logging: process.env.NODE_ENV !== "production" ? "all" : "error",
-  entities: ["src/entity/**/*.ts"],
+  entities:
+    process.env.NODE_ENV !== "production" ? ["src/entity/**/*.ts"] : ["dist/entity/**/*.js"],
   cli: {
     entitiesDir: "src/entity",
   },

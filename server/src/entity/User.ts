@@ -5,8 +5,11 @@ import {
   BaseEntity,
   CreateDateColumn,
   BeforeInsert,
+  OneToMany,
 } from "typeorm";
 import { hashPassword } from "../utils/helper";
+import { Actor } from "./Actor";
+import { Movie } from "./Movie";
 
 @Entity()
 export class User extends BaseEntity {
@@ -27,6 +30,12 @@ export class User extends BaseEntity {
 
   @CreateDateColumn()
   createdAt!: Date;
+
+  @OneToMany(() => Movie, (movie) => movie.user)
+  movies!: Movie[];
+
+  @OneToMany(() => Actor, (actor) => actor.user)
+  actors!: Actor[];
 
   @BeforeInsert()
   async hashPass() {

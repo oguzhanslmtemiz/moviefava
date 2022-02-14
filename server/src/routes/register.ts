@@ -5,6 +5,10 @@ import { registerSchema } from "../schemas/user";
 
 const router = Router();
 
+// @desc
+// @route   api/register
+// @access  Public
+
 router.post("/", validate(registerSchema), createUser);
 
 export default router;

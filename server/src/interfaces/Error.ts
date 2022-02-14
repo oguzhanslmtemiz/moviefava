@@ -18,3 +18,9 @@ interface IDriverError {
   index: number;
   sql: string;
 }
+
+export interface IJwtError {
+  name: string;
+  message: string;
+  expiredAt?: Date;
+}
