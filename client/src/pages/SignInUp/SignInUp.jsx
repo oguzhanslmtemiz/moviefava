@@ -12,7 +12,7 @@ export default function SignInUp() {
       sx={{ bgcolor: "background.default" }}
       className={[styles.container, styles[signUpMode]].join(" ")}
     >
-      <Form />
+      <Form setSignUpMode={setSignUpMode} />
       <Panel setSignUpMode={setSignUpMode} />
     </Box>
   );

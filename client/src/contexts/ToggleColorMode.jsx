@@ -1,4 +1,4 @@
-import React, { createContext } from "react";
+import { createContext, useMemo, useState } from "react";
 import { createTheme, ThemeProvider } from "@mui/material";
 import { darkTheme, lightTheme } from "../styles/theme";
 
@@ -9,18 +9,24 @@ export const ColorModeContext = createContext({
 const getDesignTokens = (mode) => (mode === "light" ? lightTheme : darkTheme);
 
 export default function ToggleColorMode({ children }) {
-  const [mode, setMode] = React.useState("dark");
+  const [mode, setMode] = useState(localStorage.getItem("mode") || "dark");
 
-  const colorMode = React.useMemo(
+  const colorMode = useMemo(
     () => ({
       toggleColorMode: () => {
-        setMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
+        localStorage.setItem("mode", mode);
+        setMode((prevMode) => {
+          const newMode = prevMode === "light" ? "dark" : "light";
+          localStorage.setItem("mode", newMode);
+          return newMode;
+        });
       },
     }),
-    []
+    [mode]
   );
 
-  const theme = React.useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
+  const theme = useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
+  document.body.style.backgroundColor = theme.palette.background.default;
 
   return (
     <ColorModeContext.Provider value={colorMode}>

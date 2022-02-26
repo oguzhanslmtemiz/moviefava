@@ -1,32 +1,45 @@
-import { Box, Container, Fab, Grid } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Box, Container, Fab, Grid, styled, Typography } from "@mui/material";
+import { useSnackbar } from "notistack";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Header from "../components/Header";
 import CategoryButton from "../components/CategoryButton";
 import ScrollTop from "../components/ScrollTop";
-import Post from "../components/Post";
-import { useParams } from "react-router-dom";
-import AddButton from "../components/AddButton";
+import { useNavigate, useParams } from "react-router-dom";
 import FormDialog from "../components/FormDialog";
-import { useEffect, useState } from "react";
-import { getProfile } from "../api";
-import { useSnackbar } from "notistack";
+import { getProfilePosts } from "../api";
+import Avatar from "../components/Avatar";
+import Post from "../components/Post";
 
 export default function Profile() {
   const { enqueueSnackbar } = useSnackbar();
-
   const [posts, setPosts] = useState([]);
-  const [postOwner, setPostOwner] = useState([]);
+  const [allPosts, setAllPosts] = useState([]);
+  const [postOwner, setPostOwner] = useState({});
   const { userId } = useParams();
-  const user = JSON.parse(localStorage.getItem("user"));
+  const loggedInUser = JSON.parse(localStorage.getItem("user"));
+  const navigate = useNavigate();
+  const isMe = postOwner?.id === loggedInUser?.id;
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const { data } = await getProfile(userId);
-        const { id, username, email, movies, actors } = data.data;
-        const posts = [...movies, ...actors];
-        setPostOwner({ id, username, email });
-        setPosts(posts);
+        const { data } = await getProfilePosts(userId);
+        const userObjectWithAllPosts = data.data;
+        if (!userObjectWithAllPosts) {
+          enqueueSnackbar("This account doesn’t exist", {
+            variant: "info",
+          });
+          return navigate("/timeline");
+        }
+        const { id, username, email, avatar, movies, actors } = userObjectWithAllPosts;
+        const postOwner = { id, username, email, avatar };
+        const userPosts = [...movies, ...actors].sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        setPostOwner(postOwner);
+        setPosts(userPosts);
+        setAllPosts(userPosts);
       } catch (error) {
         if (error.response) {
           console.log(error.response);
@@ -53,22 +66,63 @@ export default function Profile() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const Div = styled("div")(({ theme }) => ({
+    ...theme.typography.button,
+    backgroundColor: theme.palette.background.paper,
+    padding: theme.spacing(1),
+    marginBottom: theme.spacing(2),
+    color: theme.palette.text.primary,
+    display: "flex",
+    alignItems: "center",
+  }));
+
+  const deletePostFromState = (postId) => {
+    setPosts((prevState) => prevState.filter((post) => post.id !== postId));
+    setAllPosts((prevState) => prevState.filter((post) => post.id !== postId));
+  };
+
   return (
     <>
       <Header />
       <Box sx={{ bgcolor: "background.default" }}>
         <Container>
-          <Box sx={{ display: "flex", justifyContent: "center", pt: 5 }}>
-            <CategoryButton />
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              pt: 2,
+            }}
+          >
+            <Div>
+              {userId && (
+                <Typography sx={{ mr: 2 }}>
+                  {isMe ? "Your Public Page" : "Public Page of"}
+                </Typography>
+              )}
+              <Avatar
+                alt={postOwner.username}
+                src={postOwner.avatar}
+                sx={{ width: 56, height: 56, mr: 2 }}
+              />
+              <Typography>{postOwner.username}</Typography>
+            </Div>
+            <CategoryButton setPosts={setPosts} allPosts={allPosts} />
           </Box>
-          <FormDialog setPosts={setPosts} />
-          <Grid container spacing={4} sx={{ pb: 5, flexWrap: "wrap-reverse" }}>
-            {posts.map((post, i) => (
+          {isMe && !userId && <FormDialog setPosts={setPosts} setAllPosts={setAllPosts} />}
+          <Grid container spacing={4} sx={{ pb: 5 }}>
+            {posts.map((post) => (
               <Post
-                key={`${post.id + "id" + i + userId}`}
+                key={post.id + "-" + post.createdAt}
                 post={post}
                 postOwner={postOwner}
-                user={user}
+                loggedInUser={loggedInUser}
+                setPosts={setPosts}
+                setAllPosts={setAllPosts}
+                deletePostFromState={deletePostFromState}
+                page={"profile"}
+                isMe={isMe}
               />
             ))}
           </Grid>

@@ -1,9 +1,10 @@
 import { JwtPayload } from "jsonwebtoken";
 
-export interface IUser {
+export interface IUserBody {
   email: string;
   username: string;
   password: string;
+  avatar?: string;
 }
 
-export type TokenPayload = JwtPayload & Omit<IUser, "password"> & { id: number };
+export type TokenPayload = JwtPayload & Omit<IUserBody, "password"> & { id: number };

@@ -22,13 +22,16 @@ export class User extends BaseEntity {
   @Column({ unique: true })
   username!: string;
 
-  @Column()
+  @Column({ select: false })
   password!: string;
 
-  @Column({ default: false })
+  @Column({ default: false, select: false })
   isPassAutoGen!: boolean;
 
-  @CreateDateColumn()
+  @Column({ nullable: true })
+  avatar!: string;
+
+  @CreateDateColumn({ select: false })
   createdAt!: Date;
 
   @OneToMany(() => Movie, (movie) => movie.user)

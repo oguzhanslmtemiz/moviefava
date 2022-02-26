@@ -1,29 +1,26 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Container, Fab, Grid } from "@mui/material";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Header from "../components/Header";
 import CategoryButton from "../components/CategoryButton";
 import ScrollTop from "../components/ScrollTop";
-import Post from "../components/Post";
-import FormDialog from "../components/FormDialog";
 import { useSnackbar } from "notistack";
 import { getSharedPosts } from "../api";
+import Post from "../components/Post";
 
 export default function Timeline() {
   const { enqueueSnackbar } = useSnackbar();
-
   const [posts, setPosts] = useState([]);
-  const [postOwner, setPostOwner] = useState([]);
-  const user = JSON.parse(localStorage.getItem("user"));
+  const [allPosts, setAllPosts] = useState([]);
+  const loggedInUser = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
     async function fetchData() {
       try {
         const { data } = await getSharedPosts();
-        const { id, username, email, movies, actors } = data.data;
-        const posts = [...movies, ...actors];
-        setPostOwner({ id, username, email });
-        setPosts(posts);
+        const sharedPosts = data.data;
+        setPosts(sharedPosts);
+        setAllPosts(sharedPosts);
       } catch (error) {
         if (error.response) {
           console.log(error.response);
@@ -56,15 +53,17 @@ export default function Timeline() {
       <Box sx={{ bgcolor: "background.default" }}>
         <Container>
           <Box sx={{ display: "flex", justifyContent: "center", pt: 5 }}>
-            <CategoryButton />
+            <CategoryButton setPosts={setPosts} allPosts={allPosts} />
           </Box>
-          <Grid container spacing={4} sx={{ py: 5, flexWrap: "wrap-reverse" }}>
-            {posts.map((post, i) => (
+          <Grid container spacing={4} sx={{ pb: 5 }}>
+            {posts.map((post) => (
               <Post
-                key={`${post.id + "id" + i}`}
+                key={post.id + "-" + post.createdAt}
                 post={post}
-                postOwner={postOwner}
-                user={user}
+                postOwner={post.user}
+                loggedInUser={loggedInUser}
+                page={"timeline"}
+                isMe={post.user.id === loggedInUser.id}
               />
             ))}
           </Grid>

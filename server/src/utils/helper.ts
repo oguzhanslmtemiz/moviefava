@@ -1,6 +1,6 @@
 import { Boom } from "@hapi/boom";
 import bcrypt from "bcrypt";
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { User } from "../entity/User";
 import { TokenPayload } from "../interfaces/User";
@@ -50,8 +50,10 @@ const convertAlphaNumericUniqueString = (string: string): string => {
   );
 };
 
-const convertStringToBoolean = (shareable: String | undefined) => {
-  return shareable === "true" ? true : shareable;
+const sanitizeBody = (body: any) => {
+  let { shareable, ...restOfBody } = body;
+  shareable = shareable === "true" ? true : false;
+  return { shareable, ...restOfBody };
 };
 
 export {
@@ -64,5 +66,5 @@ export {
   getTokenFromHeader,
   createAlphaNumericUniqueString,
   convertAlphaNumericUniqueString,
-  convertStringToBoolean,
+  sanitizeBody,
 };

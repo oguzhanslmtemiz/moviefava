@@ -1,12 +1,12 @@
 import Boom from "@hapi/boom";
 import { Request, Response } from "express";
-import { findUserFromDB } from "../services/user";
+import { findUserFromDBIncludesPassword } from "../services/user";
 import { comparePassword, errorHandler, generateToken, sanitizeUser } from "../utils/helper";
 
 export const getUserByEmail = async (req: Request, res: Response) => {
   try {
-    const user = await findUserFromDB(req.body.email);
-    !user && errorHandler(res, Boom.unauthorized("There is no such e-mail on the system"));
+    const user = await findUserFromDBIncludesPassword(req.body.email);
+    if (!user) return errorHandler(res, Boom.unauthorized("There is no such e-mail on the system"));
     if (user) {
       // prettier-ignore
       if (user.isPassAutoGen) {

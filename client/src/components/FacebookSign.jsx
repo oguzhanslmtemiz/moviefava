@@ -1,4 +1,3 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import FacebookLogin from "react-facebook-login";
 import FacebookIcon from "@mui/icons-material/Facebook";
@@ -22,7 +21,6 @@ export default function FacebookSign() {
           "user",
           JSON.stringify({ ...data.data.user, avatar: response.picture.data.url })
         );
-        console.log(response);
         setUser({ ...data.data.user, avatar: response.picture.url });
         enqueueSnackbar(JSON.stringify(data.message), { variant: "success" });
         navigate("/profile");
@@ -34,7 +32,7 @@ export default function FacebookSign() {
 
   return (
     <FacebookLogin
-      appId="281962514006264"
+      appId="645304280003435"
       fields="name,email,picture"
       callback={responseFacebook}
       icon={<FacebookIcon sx={{ mr: 1 }} />}

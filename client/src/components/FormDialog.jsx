@@ -1,22 +1,14 @@
-import * as React from "react";
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
 import { useSnackbar } from "notistack";
 import AddButton from "./AddButton";
-import { FormControl, FormControlLabel, Switch } from "@mui/material";
 import { Box } from "@mui/system";
 import { createPost } from "../api";
 import PostForm from "./PostForm";
+import { useState } from "react";
 
-export default function FormDialog({ setPosts }) {
+export default function FormDialog({ setPosts, setAllPosts }) {
   const { enqueueSnackbar } = useSnackbar();
-  const [open, setOpen] = React.useState(false);
-  const [formType, setFormType] = React.useState();
+  const [open, setOpen] = useState(false);
+  const [formType, setFormType] = useState();
 
   const handleClickOpenFormDialog = (type) => {
     setFormType(type);
@@ -29,10 +21,11 @@ export default function FormDialog({ setPosts }) {
 
   const handlePost = async (body) => {
     try {
-      const { data } = await createPost(formType, body);
-      console.log(data);
+      const { data } = await createPost(formType.toLowerCase(), body);
       enqueueSnackbar(JSON.stringify(data.message), { variant: "success" });
-      setPosts((prevState) => [...prevState, { ...data.data, type: formType }]);
+      setPosts((prevState) => [{ ...data.data, type: formType }, ...prevState]);
+      setAllPosts((prevState) => [{ ...data.data, type: formType }, ...prevState]);
+      handleClose();
     } catch (error) {
       if (error.response) {
         console.log(error.response);
@@ -60,15 +53,13 @@ export default function FormDialog({ setPosts }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    handleClose();
     const formData = new FormData(event.currentTarget);
     const body = Object.fromEntries(formData.entries());
-    console.log(body);
     handlePost(body);
   };
 
   return (
-    <Box sx={{ textAlign: "center", mt: 2, mb: 0 }}>
+    <Box sx={{ textAlign: "center" }}>
       <AddButton handleClickOpenFormDialog={handleClickOpenFormDialog} />
       <PostForm
         handleClose={handleClose}

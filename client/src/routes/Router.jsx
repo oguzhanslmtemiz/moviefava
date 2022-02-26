@@ -2,10 +2,10 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import LandingPage from "../pages/LandingPage";
 import Profile from "../pages/Profile";
-import Movie from "../pages/Movie";
 import SignInUp from "../pages/SignInUp/SignInUp";
 import Timeline from "../pages/Timeline";
 import RequireAuth from "./RequireAuth";
+import SinglePost from "../pages/SinglePost";
 
 export default function Router() {
   return (
@@ -37,10 +37,34 @@ export default function Router() {
         }
       />
       <Route
+        path="/my/movies/:movieId"
+        element={
+          <RequireAuth>
+            <SinglePost />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/my/actors/:actorId"
+        element={
+          <RequireAuth>
+            <SinglePost />
+          </RequireAuth>
+        }
+      />
+      <Route
         path="/movies/:movieId"
         element={
           <RequireAuth>
-            <Movie />
+            <SinglePost />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/actors/:actorId"
+        element={
+          <RequireAuth>
+            <SinglePost />
           </RequireAuth>
         }
       />

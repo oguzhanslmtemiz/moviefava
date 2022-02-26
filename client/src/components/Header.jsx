@@ -1,6 +1,6 @@
+import { useContext, useEffect, useState } from "react";
 import {
   AppBar,
-  Avatar,
   Box,
   Button,
   Container,
@@ -13,25 +13,13 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-// import AppBar from "@mui/material/AppBar";
-// import Box from "@mui/material/Box";
-// import Toolbar from "@mui/material/Toolbar";
-// import IconButton from "@mui/material/IconButton";
-// import Typography from "@mui/material/Typography";
-// import Menu from "@mui/material/Menu";
-// import Container from "@mui/material/Container";
-// import Avatar from "@mui/material/Avatar";
-// import Button from "@mui/material/Button";
-// import Tooltip from "@mui/material/Tooltip";
-// import MenuItem from "@mui/material/MenuItem";
-// import { useTheme } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import { ColorModeContext } from "../contexts/ToggleColorMode";
 import useAuth from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { useContext, useEffect, useState } from "react";
+import Avatar from "./Avatar";
 
 const Header = () => {
   const { user, setUser, logout } = useAuth();
@@ -71,7 +59,6 @@ const Header = () => {
           <Typography
             variant="h6"
             noWrap
-            // component="div"
             color="Menu"
             component={Link}
             href="/timeline"
@@ -110,10 +97,13 @@ const Header = () => {
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center" component={Link} href={`${page}`}>
-                    {page}
-                  </Typography>
+                <MenuItem
+                  key={page}
+                  onClick={handleCloseNavMenu}
+                  component={Link}
+                  href={`/${page.toLowerCase()}`}
+                >
+                  <Typography textAlign="center">{page}</Typography>
                 </MenuItem>
               ))}
             </Menu>
@@ -121,7 +111,9 @@ const Header = () => {
           <Typography
             variant="h6"
             noWrap
-            component="div"
+            color="Menu"
+            component={Link}
+            href="/timeline"
             sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}
           >
             Moviefava
@@ -132,7 +124,7 @@ const Header = () => {
                 key={page}
                 onClick={handleCloseNavMenu}
                 component={Link}
-                href={`${page}`}
+                href={`/${page.toLowerCase()}`}
                 sx={{ my: 2, color: "white", display: "block" }}
               >
                 {page}
@@ -146,7 +138,7 @@ const Header = () => {
             </Typography>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt={user?.username?.toUpperCase()[0]} src={user.avatar || "/"} />
+                <Avatar alt={user?.username} src={user.avatar || "/"} />
               </IconButton>
             </Tooltip>
             <Menu

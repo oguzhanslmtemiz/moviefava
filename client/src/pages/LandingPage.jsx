@@ -1,14 +1,10 @@
-import React from "react";
-import {
-  Box,
-  Button,
-  Container,
-  styled,
-  Typography,
-  AppBar,
-  Link,
-} from "@mui/material";
+import { useEffect } from "react";
+import { Box, Button, Container, styled, Typography, AppBar, Link } from "@mui/material";
 import MuiToolbar from "@mui/material/Toolbar";
+import useAuth from "../contexts/AuthContext";
+import { authControl } from "../api";
+import { useNavigate } from "react-router-dom";
+import { useSnackbar } from "notistack";
 
 const Toolbar = styled(MuiToolbar)(({ theme }) => ({
   height: 64,
@@ -18,6 +14,27 @@ const Toolbar = styled(MuiToolbar)(({ theme }) => ({
 }));
 
 function LandingHeader() {
+  const { login, logout } = useAuth();
+  const { enqueueSnackbar } = useSnackbar();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    (async function () {
+      try {
+        await authControl();
+        await login().then(() => {
+          enqueueSnackbar(JSON.stringify("Token is valid, you're being redirected"), {
+            variant: "default",
+          });
+          navigate("/timeline");
+        });
+      } catch (error) {
+        await logout();
+        console.clear();
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <>
       <AppBar position="fixed">
@@ -52,10 +69,7 @@ function Copyright() {
   return (
     <Typography variant="body2">
       {"Copyright © "}
-      <Link
-        sx={{ color: "primary.dark" }}
-        href="https://moviefava.herokuapp.com/"
-      >
+      <Link sx={{ color: "primary.dark" }} href="https://moviefava.herokuapp.com/">
         Moviefava
       </Link>{" "}
       {new Date().getFullYear()}
@@ -124,17 +138,8 @@ export default function LandingPage() {
           }}
         >
           {/* Increase the network loading priority of the background image. */}
-          <img
-            style={{ display: "none" }}
-            src={backgroundImage}
-            alt="increase priority"
-          />
-          <Typography
-            color="inherit"
-            align="center"
-            variant="h2"
-            marked="center"
-          >
+          <img style={{ display: "none" }} src={backgroundImage} alt="increase priority" />
+          <Typography color="inherit" align="center" variant="h2" marked="center">
             Keep track of the movies you have seen
           </Typography>
           <Typography
@@ -143,9 +148,8 @@ export default function LandingPage() {
             variant="h5"
             sx={{ mb: 4, mt: { sx: 4, sm: 10 } }}
           >
-            Moviefava helps you keep a personal list of movies you have seen and
-            liked. It's fun and easy to use, whether you're a movie geek or just
-            a casual watcher.
+            Moviefava helps you keep a personal list of movies you have seen and liked. It's
+            fun and easy to use, whether you're a movie geek or just a casual watcher.
           </Typography>
           <Button
             color="secondary"

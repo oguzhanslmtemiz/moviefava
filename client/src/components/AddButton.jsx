@@ -1,16 +1,16 @@
-import * as React from "react";
-import Button from "@mui/material/Button";
-import Avatar from "@mui/material/Avatar";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
-import ListItemText from "@mui/material/ListItemText";
-import DialogTitle from "@mui/material/DialogTitle";
-import Dialog from "@mui/material/Dialog";
-import PersonIcon from "@mui/icons-material/Person";
+import {
+  Button,
+  Avatar,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  DialogTitle,
+  Dialog,
+} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import Typography from "@mui/material/Typography";
 import { blue } from "@mui/material/colors";
+import { useState } from "react";
 
 const types = ["Movie", "Actor"];
 
@@ -44,8 +44,8 @@ function SimpleDialog(props) {
 }
 
 export default function AddButton({ handleClickOpenFormDialog }) {
-  const [open, setOpen] = React.useState(false);
-  const [selectedValue, setSelectedValue] = React.useState(types[1]);
+  const [open, setOpen] = useState(false);
+  const [selectedValue, setSelectedValue] = useState(types[1]);
 
   const handleClickOpen = () => {
     setOpen(true);

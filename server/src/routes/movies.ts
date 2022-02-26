@@ -1,12 +1,16 @@
 import { Router } from "express";
+import { createCommentToMovie, getMovieComments } from "../controllers/comment";
+import { likeAndUnlikeMovie } from "../controllers/like";
 import {
   createMovie,
   deleteMovie,
   editMovie,
-  getAllUserMovies,
-  getOneMovie,
+  getMyMovie,
+  getSharedMovieOfUser,
 } from "../controllers/movie";
+import { selfAuth } from "../middlewares/auth";
 import validate from "../middlewares/validate";
+import { commentSchema } from "../schemas/comment";
 import { movieSchema } from "../schemas/movie";
 
 const router = Router();
@@ -15,20 +19,13 @@ const router = Router();
 // @route   api/movies
 // @access  Protected
 
-// router.get("/:movieId", getMovie);
 router.post("/", validate(movieSchema), createMovie);
-router.get("/", getAllUserMovies);
-router.get("/:movieId", getOneMovie);
-router.put("/:movieId", editMovie);
-router.delete("/:movieId", deleteMovie);
-
-// router.put("/:movieId",  /* validate body middleware  */ editMovie); // check owner
-// router.delete('/:movieId', deleteMovie) // check owner
-
-// router.get("/:movieId/comments", getCommentsOfMovie);
-// router.post("/:movieId/comments", /* validate body middleware  */  createCommentToMovie);
-
-// router.get("/:movieId/likes", getLikesOfMovie);
-// router.post("/:movieId/likes",  /* validate body middleware  */ createLikeToMovie);
+router.get("/my/:movieId", selfAuth, getMyMovie);
+router.get("/:movieId", getSharedMovieOfUser);
+router.put("/:movieId", validate(movieSchema), selfAuth, editMovie);
+router.delete("/:movieId/", selfAuth, deleteMovie);
+router.get("/:movieId/like", likeAndUnlikeMovie);
+router.get("/:movieId/comment", getMovieComments);
+router.post("/:movieId/comment", validate(commentSchema), createCommentToMovie);
 
 export default router;

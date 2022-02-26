@@ -1,9 +1,10 @@
 export const darkTheme = {
   breakpoints: {
-    keys: ["xs", "sm", "md", "lg", "xl"],
+    keys: ["xs", "sm", "smmd", "md", "lg", "xl"],
     values: {
       xs: 0,
       sm: 600,
+      smmd: 768,
       md: 900,
       lg: 1200,
       xl: 1536,
@@ -57,8 +58,7 @@ export const darkTheme = {
             border: "1px solid",
             borderColor: "#265D97",
             backgroundColor: "#132F4C",
-            fontFamily:
-              "Consolas,Menlo,Monaco,Andale Mono,Ubuntu Mono,monospace",
+            fontFamily: "Consolas,Menlo,Monaco,Andale Mono,Ubuntu Mono,monospace",
             fontWeight: 400,
             fontSize: "0.8125rem",
             lineHeight: 1.5,
@@ -728,10 +728,11 @@ export const darkTheme = {
 
 export const lightTheme = {
   breakpoints: {
-    keys: ["xs", "sm", "md", "lg", "xl"],
+    keys: ["xs", "sm", "smmd", "md", "lg", "xl"],
     values: {
       xs: 0,
       sm: 600,
+      smmd: 768,
       md: 900,
       lg: 1200,
       xl: 1536,
@@ -785,8 +786,7 @@ export const lightTheme = {
             border: "1px solid",
             borderColor: "#CDD2D7",
             backgroundColor: "#F3F6F9",
-            fontFamily:
-              "Consolas,Menlo,Monaco,Andale Mono,Ubuntu Mono,monospace",
+            fontFamily: "Consolas,Menlo,Monaco,Andale Mono,Ubuntu Mono,monospace",
             fontWeight: 400,
             fontSize: "0.8125rem",
             lineHeight: 1.5,

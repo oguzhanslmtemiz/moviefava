@@ -20,11 +20,25 @@ API.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+export const getComments = (type, postId) => API.get(`/${type}s/${postId}/comment`);
+
+export const createComment = (type, postId, body) => API.post(`/${type}s/${postId}/comment`, body);
+
+export const likeAndUnlikePost = (type, postId) => API.get(`/${type}s/${postId}/like`);
+
 export const getSharedPosts = () => API.get("/timeline");
 
-export const getProfile = (meOrUserId = "me") => API.get(`/users/${meOrUserId}`);
+export const getProfilePosts = (meOrUserId = "me") => API.get(`/users/${meOrUserId}`);
+
+export const getMyPost = (type, postId) => API.get(`/${type}s/my/${postId}`);
+
+export const getPost = (type, postId) => API.get(`/${type}s/${postId}`);
 
 export const createPost = (type, body) => API.post(`/${type}s`, body);
+
+export const updatePost = (type, postId, body) => API.put(`/${type}s/${postId}`, body);
+
+export const deletePost = (type, postId) => API.delete(`/${type}s/${postId}`);
 
 export const authControl = () => API.get("/auth");
 

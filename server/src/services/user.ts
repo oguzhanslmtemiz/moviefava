@@ -1,8 +1,8 @@
 import { User } from "../entity/User";
-import { IUser } from "../interfaces/User";
+import { IUserBody } from "../interfaces/User";
 
 const createUserInDB = async (
-  userDataFromReqBody: IUser,
+  userDataFromReqBody: IUserBody,
   isSocialRegister: boolean = false
 ) => {
   return isSocialRegister
@@ -10,19 +10,39 @@ const createUserInDB = async (
     : await User.create(userDataFromReqBody).save();
 };
 
-const findUserFromDB = async (userEmailFromReqBody: string) => {
-  return await User.findOne({ email: userEmailFromReqBody });
+const findUserFromDBIncludesPassword = async (userEmailFromReqBody: string) => {
+  return await User.findOne(
+    { email: userEmailFromReqBody },
+    { select: ["id", "email", "username", "password", "isPassAutoGen", "avatar", "createdAt"] }
+  );
 };
 
 const getUserPosts = async (userId: number) => {
-  return await User.findOne({
-    relations: ["movies", "actors"],
-    where: { id: userId },
-    select: ["email", "id", "username"],
-  });
-  // return await User.find({ relations: ["movies", "actors"], where: { id: userId } });
-  //   // return await Movie.find({ relations: ["user"] });
-  // return await Movie.find({ where: { user: { id: userId } } });
+  return await User.createQueryBuilder("user")
+    .where(`user.id = ${userId}`)
+    .leftJoinAndSelect("user.movies", "movies")
+    .leftJoinAndSelect("user.actors", "actors")
+    .leftJoinAndSelect("movies.likes", "movieLikes")
+    .leftJoinAndSelect("movieLikes.liker", "movieLiker")
+    .loadRelationCountAndMap("movies.countOfComments", "movies.comments")
+    .leftJoinAndSelect("actors.likes", "actorLikes")
+    .leftJoinAndSelect("actorLikes.liker", "actorliker")
+    .loadRelationCountAndMap("actors.countOfComments", "actors.comments")
+    .getOne();
 };
 
-export { createUserInDB, findUserFromDB, getUserPosts };
+const getUserSharedPosts = async (userId: number) => {
+  return await User.createQueryBuilder("user")
+    .where(`user.id = ${userId}`)
+    .leftJoinAndSelect("user.movies", "movies", "movies.shareable = true")
+    .leftJoinAndSelect("user.actors", "actors", "actors.shareable = true")
+    .leftJoinAndSelect("movies.likes", "movieLikes")
+    .leftJoinAndSelect("movieLikes.liker", "movieLiker")
+    .loadRelationCountAndMap("movies.countOfComments", "movies.comments")
+    .leftJoinAndSelect("actors.likes", "actorLikes")
+    .leftJoinAndSelect("actorLikes.liker", "actorliker")
+    .loadRelationCountAndMap("actors.countOfComments", "actors.comments")
+    .getOne();
+};
+
+export { createUserInDB, findUserFromDBIncludesPassword, getUserPosts, getUserSharedPosts };

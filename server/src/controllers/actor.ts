@@ -1,16 +1,22 @@
 import { Request, Response } from "express";
 import Boom from "@hapi/boom";
-import { convertStringToBoolean, errorHandler } from "../utils/helper";
+import { errorHandler, sanitizeBody } from "../utils/helper";
 import { IDatabaseError } from "../interfaces/Error";
 import { TokenPayload } from "../interfaces/User";
-import { createActorInDB } from "../services/actor";
+import {
+  createActorInDB,
+  deleteOneActor,
+  getSharedActor,
+  updateActor,
+} from "../services/actor";
+import { getCountOfCommentsToActor } from "../services/comment";
 
 export const createActor = async (req: Request, res: Response) => {
   try {
     const decodedToken = res.locals.user as TokenPayload;
-    let { shareable, ...restOfBody } = req.body;
-    shareable = convertStringToBoolean(shareable);
-    const actor = await createActorInDB(decodedToken.id, { shareable, ...restOfBody });
+    const body = sanitizeBody(req.body);
+    const actorObj = { user: decodedToken.id, ...body };
+    const actor = await createActorInDB(actorObj);
 
     res.status(201).send({ success: true, message: "Actor created", data: actor });
   } catch (error) {
@@ -23,10 +29,45 @@ export const createActor = async (req: Request, res: Response) => {
   }
 };
 
+export const getMyActor = async (req: Request, res: Response) => {
+  try {
+    const { post, id, email, username, avatar } = res.locals.user;
+    const countOfComments = await getCountOfCommentsToActor(post.id);
+    const response = { ...post, user: { id, email, username, avatar }, countOfComments };
+    res
+      .status(200)
+      .send({ success: true, message: "Actor successfully send", data: response });
+  } catch (error) {
+    errorHandler(res, Boom.internal("", error));
+  }
+};
+
+export const getSharedActorOfUser = async (req: Request, res: Response) => {
+  try {
+    const actor = await getSharedActor(parseInt(req.params.actorId));
+    !actor
+      ? errorHandler(res, Boom.notFound("Actor not found"))
+      : res
+          .status(200)
+          .send({ success: true, message: "Actor successfully send", data: actor });
+  } catch (error) {
+    errorHandler(res, Boom.internal("", error));
+  }
+};
+
 export const editActor = async (req: Request, res: Response) => {
   try {
-    const decodedToken = res.locals.user;
-    //
+    await updateActor(parseInt(req.params.actorId), sanitizeBody(req.body));
+    res.status(200).send({ success: true, message: "Actor updated" });
+  } catch (error) {
+    errorHandler(res, Boom.internal("", error));
+  }
+};
+
+export const deleteActor = async (req: Request, res: Response) => {
+  try {
+    await deleteOneActor(parseInt(req.params.actorId));
+    res.status(200).send({ success: true, message: "Actor deleted" });
   } catch (error) {
     errorHandler(res, Boom.internal("", error));
   }

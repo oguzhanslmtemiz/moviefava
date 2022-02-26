@@ -17,14 +17,14 @@ export default (app: Application) => {
     })
   );
 
-  // app.use(express.static(path.join(__dirname, "../../../client/build")));
-
-  // app.get("/*", (req, res) => {
-  //   res.sendFile(path.join(__dirname, "../../../client/build", "index.html"));
-  // });
-
   // Routes
   app.use("/api", routes);
+
+  app.use(express.static(path.join(__dirname, "../../build")));
+
+  app.get("/*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../../build", "index.html"));
+  });
 
   if (process.env.NODE_ENV === "development") {
     app.use(morgan("dev"));

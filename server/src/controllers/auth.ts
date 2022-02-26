@@ -1,8 +1,8 @@
 import Boom from "@hapi/boom";
 import { Request, Response } from "express";
 import { IDatabaseError } from "../interfaces/Error";
-import { IUser } from "../interfaces/User";
-import { createUserInDB, findUserFromDB } from "../services/user";
+import { IUserBody } from "../interfaces/User";
+import { createUserInDB, findUserFromDBIncludesPassword } from "../services/user";
 import {
   convertAlphaNumericUniqueString,
   createAlphaNumericUniqueString,
@@ -15,13 +15,15 @@ export const socialLoginAuth = async (req: Request, res: Response) => {
   try {
     const socialLoginCredentialsFromClient = req.body;
 
-    let user = await findUserFromDB(socialLoginCredentialsFromClient.email);
-
+    let user = await findUserFromDBIncludesPassword(socialLoginCredentialsFromClient.email);
     if (!user) {
-      const userCredentials: IUser = {
+      const userCredentials: IUserBody = {
         email: socialLoginCredentialsFromClient.email,
         password: createAlphaNumericUniqueString(),
         username: convertAlphaNumericUniqueString(socialLoginCredentialsFromClient.name),
+        avatar:
+          socialLoginCredentialsFromClient.picture?.data?.url ||
+          socialLoginCredentialsFromClient.imageUrl,
       };
       user = await createUserInDB(userCredentials, true);
     }

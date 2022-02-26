@@ -6,7 +6,7 @@ import { signUp } from "../../api";
 
 const inputStyle = { maxWidth: 380, width: "100%" };
 
-export default function Register() {
+export default function Register({setSignUpMode}) {
   const { enqueueSnackbar } = useSnackbar();
 
   const [emailError, setEmailError] = useState(false);
@@ -21,6 +21,7 @@ export default function Register() {
       const { data } = await signUp(body);
       enqueueSnackbar(JSON.stringify(data.message), { variant: "success" });
       enqueueSnackbar("You will not be redirected. Please go and login", { variant: "info" });
+      setSignUpMode("")
     } catch (error) {
       if (error.response) {
         // The request was made and the server responded with a status code

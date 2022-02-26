@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getMyProfileWithPosts, getUserProfileWithPosts } from "../controllers/user";
+import { getMyProfileWithPosts, getUserProfileWithSharedPosts } from "../controllers/user";
 
 const router = Router();
 
@@ -8,9 +8,6 @@ const router = Router();
 // @access  Protected
 
 router.get("/me", getMyProfileWithPosts);
-router.get("/:userId", getUserProfileWithPosts);
-
-// router.get("/:userId/movies", getUserMovies);    // only shared // extra feature
-// router.get("/:userId/actors", getUserActors);    // only shared // extra feature
+router.get("/:userId", getUserProfileWithSharedPosts);
 
 export default router;
